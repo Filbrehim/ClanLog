@@ -24,7 +24,7 @@ case $(hostname) in
     falfaren )
 	
 	DESTINATION=data
-	for destination in ${DESTINATION} data
+	for destination in ${DESTINATION}
 	do
     
 	    rsync --archive --verbose \
