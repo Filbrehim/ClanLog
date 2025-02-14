@@ -267,6 +267,8 @@ class professions:
         l'objectif de combien pour qui est atteint ?
         """
 
+        if qui not in self.appréciations :
+            return
         tmp_obj = self.résumé_métier(qui)
         préfixe = ""
         manque = combien - tmp_obj
