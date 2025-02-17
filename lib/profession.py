@@ -346,7 +346,7 @@ class professions:
 
     def correction_indiv(self,qui,coef,ref) :
         """! calcule les corrections d'un seul prof """
-        if qui in self.appréciations :
+        if qui in self.appréciations and ref in self.appréciations :
             self.appréciations[qui]['corrigé'] = int(self.appréciations[qui]['niveau'] + coef * self.appréciations[ref]['niveau'])
 
     def correction_globale(self) :
