@@ -45,5 +45,7 @@ if args.objectif :
     raison = f"< {obj} (Eva={evus}) divisé par 5"
     p1.pousser_objectif('Dentir Longtooth',obj,raison)
     p1.pousser_objectif('Skea Brightfur',obj,raison)
-
+    obj = evus // 10
+    raison = f"< {obj} un dixième de (Eva={evus})"
+    p1.pousser_objectif('Loovma Geer',obj,raison)
     p1.lister_objectif()
