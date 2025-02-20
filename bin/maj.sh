@@ -10,7 +10,7 @@ case $(hostname) in
 	for destination in ${DESTINATION}
 	do
 	    
-	    rsync --archive \
+	    rsync --archive --verbose \
 		  ~/ClanLord/Text\ Logs/* ~cl.balangar/Copie/Text\ Logs/ \
 		  ${destination}
 
