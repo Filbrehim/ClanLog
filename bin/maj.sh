@@ -10,7 +10,7 @@ case $(hostname) in
 	for destination in ${DESTINATION}
 	do
 	    
-	    rsync --archive --verbose \
+	    rsync --archive \
 		  ~/ClanLord/Text\ Logs/* ~cl.balangar/Copie/Text\ Logs/ \
 		  ${destination}
 
@@ -37,5 +37,5 @@ esac
 
 cat <<EOF|tee {data,results,tmp}/CACHEDIR.TAG 
 Signature: 8a477f597d28d172789f06886806bc55
-dernières mise à jour $(date "+%A %e %B %T")
+dernières mise à jour $(LC_TIME=fr_FR.utf-8 date "+%A %1d %B %T")
 EOF

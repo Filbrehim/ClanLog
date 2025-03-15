@@ -63,5 +63,8 @@ if args.objectif :
     p1.pousser_objectif('Skea Brightfur',obj,raison)
     p1.pousser_objectif('Proximus',obj,raison)
     p1.pousser_objectif('Hardia',obj,raison)
+    obj = eva // 10
+    raison = f"< {obj} (Eva={eva}) divisé par 10"
+    p1.pousser_objectif('Radium',obj,raison)
 
     p1.lister_objectif()
