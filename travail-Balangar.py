@@ -38,17 +38,20 @@ p1.afficher()
 print(f"\n - {p1.dernier_prof} est le dernier professeur")
 
 if args.ratio :
-    print("\n - Ratio Eva:Sprite 5:1")
     eva = p1.résumé_métier('Eva')
     sprite = p1.résumé_métier('Sprite')
-    r_sprite = 5 * sprite / eva
-    if 5 * sprite > eva :
-        delta = 5 * sprite - eva
-        print(f"\t • il manque {delta} Eva (5/{r_sprite:.3f})")
+    r_sprite0 = 5
+    if eva > 500 :
+        r_sprite0 = 4
+    print(f"\n - Ratio Eva:Sprite {r_sprite0}:1")
+    r_sprite = r_sprite0 * sprite / eva
+    if r_sprite0 * sprite > eva :
+        delta = r_sprite0 * sprite - eva
+        print(f"\t • il manque {delta} Eva ({r_sprite0}/{r_sprite:.3f})")
     else :
-        delta = (eva // 5) - sprite
+        delta = (eva // r_sprite0 ) - sprite
         if delta > 0 :
-            print(f"\t • il manque {delta} Sprite (5/{r_sprite:.3f})")
+            print(f"\t • il manque {delta} Sprite ({r_sprite0}/{r_sprite:.3f})")
 
 if args.objectif :
     print("\n - Objectifs")
@@ -60,5 +63,8 @@ if args.objectif :
     p1.pousser_objectif('Skea Brightfur',obj,raison)
     p1.pousser_objectif('Proximus',obj,raison)
     p1.pousser_objectif('Hardia',obj,raison)
+    obj = eva // 10
+    raison = f"< {obj} (Eva={eva}) divisé par 10"
+    p1.pousser_objectif('Radium',obj,raison)
 
     p1.lister_objectif()
