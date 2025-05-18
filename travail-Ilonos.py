@@ -13,12 +13,12 @@ parser.add_argument('--directory','--repertoire',
                     action='store',dest='repertoire',default='data',
                     help="""le répertoire avec les Text Logs/* de CL
                     (celui du dessus, le nom du personnage est ajouté)""")
-parser.add_argument('-r','--ratio',action='store_false',
-                    help="ne calcul pas le ratio Eva/Sprite")
+#parser.add_argument('-r','--ratio',action='store_false',
+#                    help="ne calcul pas le ratio Eva/Sprite")
 parser.add_argument('-o','--objectif',action='store_false',
                     help="ne calcul pas les objectifs")
 
-qui = "Balangar"
+qui = "Ilonos"
 args = parser.parse_args()
 p1 = profession.professions(qui,arguments=args)
 
@@ -37,34 +37,15 @@ p1.afficher()
 
 print(f"\n - {p1.dernier_prof} est le dernier professeur")
 
-if args.ratio :
-    eva = p1.résumé_métier('Eva')
-    sprite = p1.résumé_métier('Sprite')
-    r_sprite0 = 5
-    if eva > 500 :
-        r_sprite0 = 4
-    print(f"\n - Ratio Eva:Sprite {r_sprite0}:1")
-    r_sprite = r_sprite0 * sprite / eva
-    if r_sprite0 * sprite > eva :
-        delta = r_sprite0 * sprite - eva
-        print(f"\t • il manque {delta:3} Eva ({r_sprite0}/{r_sprite:.3f})")
-    else :
-        delta = (eva // r_sprite0 ) - sprite
-        if delta > 0 :
-            print(f"\t • il manque {delta:3} Sprite ({r_sprite0}/{r_sprite:.3f})")
-
 if args.objectif :
     print("\n - Objectifs")
     p1.pousser_objectif('Master Mentus',20,"franchir le portail sans encombre")
-    eva = p1.résumé_métier('Eva')
-    obj = eva // 4
-    raison = f"< {obj} (Eva={eva}) divisé par 4"
+    evus = p1.résumé_métier('Evus')
+    obj = evus // 5
+    raison = f"< {obj} (Eva={evus}) divisé par 5"
     p1.pousser_objectif('Dentir Longtooth',obj,raison)
     p1.pousser_objectif('Skea Brightfur',obj,raison)
-    p1.pousser_objectif('Proximus',obj,raison)
-    p1.pousser_objectif('Hardia',obj,raison)
-    obj = eva // 10
-    raison = f"< {obj} (Eva={eva}) divisé par 10"
-    p1.pousser_objectif('Radium',obj,raison)
-
+    obj = evus // 10
+    raison = f"< {obj} un dixième de (Eva={evus})"
+    p1.pousser_objectif('Loovma Geer',obj,raison)
     p1.lister_objectif()
