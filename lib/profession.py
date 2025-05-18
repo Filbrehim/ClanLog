@@ -65,6 +65,8 @@ class professions:
         """
         
         self.moi           = qui
+        self.bow           = False
+        self.incliner      = ""
         self.appréciation_re = re.compile('^(?P<qui>[A-Za-z ]+) says, "Hail, ' + qui + r'.\s+(?P<comment>[A-Za-z ]+)."')
         "l'expression régulière qui capture les compliments du professeur"
         self.dernier_pm    = 'says, "Welcome aboard.'
@@ -143,6 +145,16 @@ class professions:
             return 1
 
         for p1 in self.professeurs :
+            if self.bow :
+                for tmp_c in self.compliments :
+                    if ligne.find(tmp_c) != -1 :
+                        self.appréciations[self.incliner]['comment'] = tmp_c
+                        return 1
+            self.bow = False
+            if ligne.find(p1+" bows") != -1 :
+                self.bow = True
+                self.incliner = p1
+                return 1
             if self.professeurs[p1]['progrés'] == "*commun*" :
                 if 'professeur' in self.professeurs[p1] :
                     if self.professeurs[p1]['professeur'] in ligne :

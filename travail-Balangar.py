@@ -47,11 +47,11 @@ if args.ratio :
     r_sprite = r_sprite0 * sprite / eva
     if r_sprite0 * sprite > eva :
         delta = r_sprite0 * sprite - eva
-        print(f"\t • il manque {delta} Eva ({r_sprite0}/{r_sprite:.3f})")
+        print(f"\t • il manque {delta:3} Eva ({r_sprite0}/{r_sprite:.3f})")
     else :
         delta = (eva // r_sprite0 ) - sprite
         if delta > 0 :
-            print(f"\t • il manque {delta} Sprite ({r_sprite0}/{r_sprite:.3f})")
+            print(f"\t • il manque {delta:3} Sprite ({r_sprite0}/{r_sprite:.3f})")
 
 if args.objectif :
     print("\n - Objectifs")
