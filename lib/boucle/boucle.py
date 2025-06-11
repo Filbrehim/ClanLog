@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from time import mktime,strptime
+from time import mktime,strptime,time
 
 
 def boucle_lecture(données) :
@@ -14,6 +14,11 @@ def boucle_lecture(données) :
     chercher = données['boucle']
     fichier_courant = 0
     six_pct = données['nb fichier'] // 6
+    fichiers_cherchés = 0
+    filtre_date = -1
+    dés = ""
+    if "filtre_date" in données :
+        filtre_date = int(time()) - données['filtre_date']
     if données['nb fichier'] < 100 :
         six_pct = 100
     for fichier in sorted(os.listdir(base_data)):
@@ -23,7 +28,9 @@ def boucle_lecture(données) :
                 dés = chr(9855 + (fichier_courant // six_pct)) + " "
                 print(dés,end='',flush=True)
             quand = mktime(strptime(fichier[7:26],"%Y-%m-%d %H.%M.%S"))
+            if quand < filtre_date : continue
             c2 = dict()
+            fichiers_cherchés = fichiers_cherchés + 1
             for c in chercher :
                 if quand > chercher[c].début_session(quand,fichier) :
                     c2[c] = chercher[c]
@@ -33,11 +40,11 @@ def boucle_lecture(données) :
                         c2[c].analyser_ligne(ligne)
             for c in chercher :
                 chercher[c].fin_session()
-    print(" !")
+    if dés != "" : print(" !")
     for c in chercher :
         chercher[c].fin_analyse()
 
-    return f"analysé {fichier_courant} fichiers dans {base_data}",None
+    return f"analysé {fichiers_cherchés}/{fichier_courant} fichiers dans {base_data}",None
 
 
 def boucle_affichage(données) :

@@ -148,7 +148,10 @@ class professions:
             if self.bow :
                 for tmp_c in self.compliments :
                     if ligne.find(tmp_c) != -1 :
-                        self.appréciations[self.incliner]['comment'] = tmp_c
+                        if self.incliner in self.appréciations :
+                            self.appréciations[self.incliner]['comment'] = tmp_c
+                        else :
+                            self.appréciations[self.incliner] = { 'comment' : tmp_c , 'niveau' : 550  }
                         return 1
             self.bow = False
             if ligne.find(p1+" bows") != -1 :

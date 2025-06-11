@@ -18,6 +18,7 @@ exit_on_error = True
 nb_commande = 0
 repertoire = "data"
 terminal = 0
+previous_status = ""
 
 parser = argparse.ArgumentParser("Interroge les log ClanLord")
 parser.add_argument('--init',action='store',dest='initrc',default=None)
@@ -28,6 +29,86 @@ top.title("On la boucle ?")
 top.geometry('880x550-0+0')
 top.config(bg=background)
 
+
+def choix_balangar() : traiter_commande("personnage Balangar" )
+def choix_ilonos() : traiter_commande("personnage Ilonos" ) 
+
+def choix_analyse() :
+    global analyse_choisie,str_analyse
+
+    tmp_liste = {}
+    for a in analyse_choisie :
+        if a == "toutes" and analyse_choisie[a].get() == 1 :
+            str_analyse.set("tout analyser")
+            return 
+        elif analyse_choisie[a].get() == 1 :
+            tmp_liste[a] = 1
+    if len(tmp_liste) == 0 :
+        str_analyse.set("aucune analyse")
+    else :
+        str_analyse.set(",".join(tmp_liste))
+
+def boucle_afficher() :
+    """
+    analyse les menus cochés/décochés
+    lance la boucle
+    affiche les résultats
+    """
+    global analyse_choisie,temporel_choisi,str_chercher,previous_status
+
+    combien_analyse = 0
+    for a in analyse_choisie :
+        if analyse_choisie[a].get() == 1 :
+            combien_analyse = combien_analyse + 1
+            if a == "toutes" :
+                traiter_commande("analyse toutes",True)
+                break
+            else :
+                traiter_commande(f"analyse {a}",True)
+        else :
+            if 'boucle' in données :
+                if a in données['boucle'] :
+                    del données['boucle'][a]
+                    previous_status = f"{previous_status}\n-> retrait de {a} de l'analyse"
+    if combien_analyse == 0 :
+        print("aucune analyse choisie")
+        return
+    if "filtre_date" in données :
+        filtre = données["filtre_date"]
+        del données["filtre_date"]
+    for t in temporel_choisi :
+        if temporel_choisi[t].get() == 1 :
+            traiter_commande(f"filtre {t}",True)
+            break
+    traiter_commande("boucle",True)
+    if str_chercher.get() != "" :
+        traiter_commande("cherche:{}".format(str_chercher.get()),True)
+    else :
+        traiter_commande("afficher",True)
+
+    afficher_status_tk(previous_status)
+    previous_status = ""
+
+def afficher_chercher(event=None):
+    "affiche les rasultats, filtré par le champ chercher"
+
+    global previous_status,str_chercher
+
+    if str_chercher.get().strip() == "" :
+        afficher_status_tk("aucun champ saisie",-1)
+        return
+    previous_status = ""
+    traiter_commande("cherche:{}".format(str_chercher.get()),True)
+    afficher_status_tk(previous_status)
+    previous_status = ""
+    
+def choix_personnage(valeur):
+    global debuguer,perso_menu
+
+    if debuguer is not None :
+        print(f" - personnage choisi {valeur}")
+    traiter_commande(f"personnage {valeur}")
+    perso_menu.configure(text=valeur)
 
 def unecommande(event=None):
     """lit une commande"""
@@ -59,13 +140,19 @@ setlocale(LC_TIME, 'fr_FR.utf8')
 # Ligne 1 : Nom du perso & repertoire
 nb_lignes = 1
 
+str_personnage = tkinter.StringVar()
+str_personnage.set("Choisir le personnage")
+str_analyse = tkinter.StringVar()
+str_analyse.set("aucune analyse choisie")
+str_chercher = tkinter.StringVar()
+str_chercher.set("")
 num_cmd = tkinter.Label(top,
                         text="0",
                         font=("Courier",20),
                         background=background)
 num_cmd.grid(row=nb_lignes,column=1)
 information_lbl = tkinter.Label(top,
-                                text="emplacement à louer",
+                                textvariable=str_personnage,
                                 font=('Serif',25),
                                 background=background)
 information_lbl.grid(row=nb_lignes,column=2,columnspan=6)
@@ -77,30 +164,89 @@ repertoire_lbl = tkinter.Label(top,
 repertoire_lbl.grid(row=nb_lignes,column=7,columnspan=2)
 
 
-# Ligne 3 : statut dernière commande
+
+# ligne  : choix du personnage
+nb_lignes = nb_lignes + 1
+liste_perso = [ "Balangar" , "Forkalir" , "Ilonos" ]
+
+nb_colone = 1
+perso_menu = tkinter.Menubutton(top,
+                                textvariable = str_personnage,
+                                width='20',
+                                borderwidth=2,
+                                bg=background,
+                                activebackground='darkorange' )
+perso_menu.grid(row=nb_lignes,column=nb_colone,columnspan=2)
+nb_colone = nb_colone + 2
+perso_déroulant= tkinter.Menu(perso_menu)
+#for perso in liste_perso :
+#    tmpf = lambda : choix_personnage(perso)
+#    perso_déroulant.add_command(label=f" - {perso} - ",command = tmpf )
+perso_déroulant.add_command(label=" * Balangar * ",command=choix_balangar)
+perso_déroulant.add_command(label=" * Ilonos * ",command=choix_ilonos)
+perso_menu.configure(menu=perso_déroulant)
+
+
+analyse_choisie={}
+temporel_choisi = {}
+analyse_menu = tkinter.Menubutton(top,
+                                  textvariable = str_analyse,
+                                  borderwidth=2,
+                                  bg=background,
+                                  activebackground='darkorange' )
+analyse_menu.grid(row=nb_lignes,column=nb_colone,columnspan=3)
+analyse_déroulant = tkinter.Menu(analyse_menu)
+for analyse in [ "toutes", "butin", "dépeçage", "profession", "victoire" ] :
+    analyse_choisie[analyse]=tkinter.IntVar()
+    analyse_déroulant.add_checkbutton(label=analyse,
+                                      variable=analyse_choisie[analyse],
+                                      onvalue=1,
+                                      offvalue=0,
+                                      command=choix_analyse)
+analyse_déroulant.add_separator()
+for filtre_temporel in [ "jour", "semaine" ,"mois" ] :
+    temporel_choisi[filtre_temporel] = tkinter.IntVar()
+    analyse_déroulant.add_checkbutton(label=filtre_temporel,
+                                      variable=temporel_choisi[filtre_temporel],
+                                      onvalue=1,
+                                      offvalue=0)
+analyse_déroulant.add_separator()
+analyse_déroulant.add_command(label="boucle et afficher",command=boucle_afficher)
+analyse_menu.configure(menu=analyse_déroulant)
+nb_colone = nb_colone + 3
+
+chercher_lbl = tkinter.Label(top,text="chercher:",background=background,anchor="e")
+chercher_lbl.grid(row=nb_lignes,column=nb_colone,columnspan=1)
+
+chercher_input = tkinter.Entry(top,textvariable=str_chercher,width=30)
+chercher_input.grid(row=nb_lignes,column=nb_colone+1,columnspan=2)
+chercher_input.bind("<Return>",afficher_chercher)
+
+# Ligne : statut dernière commande
 nb_lignes = nb_lignes + 1
 status_cmd = tkinter.Label(top,
                            text="aucune commande saisie",
                            background="white",
                            font=("Courier",12),
+                           justify="left",
                            anchor="w")
 status_cmd.grid(row=nb_lignes,column=2,columnspan=8,
                 pady=5,padx=5,sticky="ew")
 
-# Ligne 3 : statut dernière commande
+# Ligne  : aide dernière commande
 nb_lignes = nb_lignes + 1
 aide_lbl = tkinter.Label(top,
                          text="aucune commande saisie",
+                         justify="left",
                          anchor="w")
 aide_lbl.grid(row=nb_lignes,column=1,columnspan=10,
               pady=5,padx=10,sticky="ew")
 
-
 # Ligne de fin : saisie
 nb_lignes = nb_lignes + 1
 
-my_cmd = tkinter.StringVar()  # For the messages to be sent.
-my_cmd.set("Saisir une commande")
+my_cmd = tkinter.StringVar()  
+my_cmd.set("")
 entry_field = tkinter.Entry(top, textvariable=my_cmd, width=100)
 entry_field.bind("<Return>", unecommande)
 # entry_field.bind("<Ctrl-U>", my_cmd.set(""))
@@ -117,6 +263,11 @@ commande = {'répertoire' : {'fonction' : valider.valider_repertoire,
                             'arrité' : 1 ,
                             'afficher' : 10 ,
                             'aide' : "défini le répertoire text logs (au dessus du presonnage)"},
+            'filtre' : {'fonction' : valider.filtrer_date,
+                         'arrité' : 1 ,
+                         'afficher' : 25 ,
+                         'aide' : "filtre les fichiers sur les dates : jour,semaine,mois"},
+
             'personnage' : {'fonction' : valider.valider_personnage ,
                             'arrité' : 1,
                             'afficher' : 10 ,
@@ -124,23 +275,17 @@ commande = {'répertoire' : {'fonction' : valider.valider_repertoire,
             'analyse' : {'fonction' : valider.valider_analyse ,
                          'arrité' : 1,
                          'afficher' : 20 ,
-                         'aide' : "ajoute une analyse (toutes,*,profession,dépeçage,butin)"},
-            'profession' : {'fonction' : valider.valider_profession,
-                            'arrité' : 0,
-                            'afficher' : 0 ,
-                            'aide' : """ajout le calcul des professions dans les boucles
- * déprécié, utiliser "analyse profession"
-"""},
+                         'aide' : "ajoute une analyse (toutes,*,profession,dépeçage,butin,victoire)"},
             'boucle' : {'fonction' : boucle.boucle_lecture,
                         'arrité' : 0,
                         'afficher' : 30 ,
-                        'aide' : "lance la boucle principale .. suspense"},
+                        'aide' : "lance la boucle principale."},
 
-            'afficher' : {'fonction' : boucle.boucle_affichage,
+            'affiche' : {'fonction' : boucle.boucle_affichage,
                           'arrité' : 0 ,
                           'afficher' : 40 ,
                           'aide' : "affiche les résultats"},
-            'chercher' : {'fonction' : boucle.boucle_chercher,
+            'cherche' : {'fonction' : boucle.boucle_chercher,
                           'arrité' : 1 ,
                           'afficher' : 50 ,
                           'aide' : 'cherche un terme,\n * utiliser =terme pour une recherche exacte' },
@@ -177,22 +322,24 @@ def afficher_status_tk(status,code=1) :
 def afficher_global() :
     """affiche tous les paramètres"""
 
-    global debuguer,nb_commande
+    global debuguer,nb_commande,str_personnage
     if debuguer is not None :
         debuguer.pprint(données)
     num_cmd.configure(text=f"{nb_commande}")
     if 'personnage' in données :
-        information_lbl.configure(text=données['personnage'],foreground="red")
+        str_personnage.set(données['personnage'])
+        information_lbl.configure(foreground="red")
     if 'nb fichier' in données :
         repertoire_lbl.configure(text=f"{données['répertoire']} ({données['nb fichier']}/{données['total']})")
     else :
         repertoire_lbl.configure(text=f"{données['répertoire']} (??)")
 
-def traiter_commande(ligne):
+
+def traiter_commande(ligne,keep_status = False):
     """traite la commande"""
 
-    global commande,nb_commande
-    
+    global commande,nb_commande,previous_status
+
     if len(ligne) < 2 or ligne[0] == "#" or ligne[0] == ";" :
         return
     cmd_absente = True
@@ -207,7 +354,9 @@ def traiter_commande(ligne):
             if commande[c]['arrité'] == 0 :
                 cmd_c,données_tmp = commande[c]['fonction'](données)
                 if cmd_c is not None :
-                    status = status + "\n\n" + cmd_c
+                    status = status + "\n" + cmd_c
+                    if keep_status :
+                        previous_status = f"{previous_status}\n{status}"
                     afficher_status_tk(c+":\n"+cmd_c,0)
                     if 'afficher' in commande[c] : purge_aide(commande[c]['afficher'])
                 else:
@@ -217,7 +366,9 @@ def traiter_commande(ligne):
                 cmd_t = ligne.strip().split()
                 if ligne.find(":") > 0 :
                     cmd_t = list(map(lambda x:x.strip(" \n\t\r"),ligne.split(":")))
-                status = status + f"\n\t {cmd_t[1]=}\n\n "
+                status = status + f"\n\t {cmd_t[1]=}\n"
+                if keep_status :
+                    previous_status = f"{previous_status}\n{status}"
                 cmd_c,données_tmp = commande[c]['fonction'](données,cmd_t[1])
                 if cmd_c is not None :
                     status = status + cmd_c
@@ -228,7 +379,7 @@ def traiter_commande(ligne):
                     afficher_status_tk(c+"/"+données_tmp,-1)
                     print(données_tmp)
             nb_commande = nb_commande + 1
-            print(f" cmd[{nb_commande}] : {ligne}\n\t - {status}")
+            # print(f" cmd[{nb_commande}] : {ligne}\n\t - {status}")
             break
     if cmd_absente :
         afficher_status_tk(f"commande inconnue {ligne}",-1)

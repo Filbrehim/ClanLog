@@ -159,7 +159,9 @@ class peauetdent:
                 print(ligne + ".")
 
     def chercher_afficher(self,quoi) :
-        """affiche le resultat"""
+        """affiche le resultat de la recherche de quoi
+        @param quoi est donné en minuscule
+        """
 
         ligne = " " * 30 + " :  # ,  Σ  , moi ,  ->m,  m->,  profit."
         entete_tty = f"\n\t \x1b[31mDépeçage pour {self.moi}\x1b[0m ({quoi})\n" + ligne
@@ -169,7 +171,7 @@ class peauetdent:
 #        quoi = quoi.lower()
         if quoi[0] == "=" :
             exacte = True
-            quoi = quoi[1:]
+            quoi2 = quoi[1:]
         for a in sorted(self.animaux,key=cmp_to_key(lambda a,b : self.trier_resultats(a,b))) :
             if exacte and a.lower() != quoi :
                 continue

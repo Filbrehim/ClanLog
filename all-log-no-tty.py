@@ -9,7 +9,7 @@ from time import mktime,strptime
 from lib import divers,familier,métrique,profession,skinndent,vaincu
 
 parser = argparse.ArgumentParser(description="analyse les logs de ClanLord")
-parser.add_argument('--bounty',action='store_true',dest='bounty',
+parser.add_argument('--bounty','--butin',action='store_true',dest='bounty',
                     help='calcul le butin')
 parser.add_argument('-3','--core3',action='store_true',dest='core3',
                     help='ne prend que Skinn, kill et profession')

@@ -46,6 +46,6 @@ if args.objectif :
     p1.pousser_objectif('Dentir Longtooth',obj,raison)
     p1.pousser_objectif('Skea Brightfur',obj,raison)
     obj = evus // 10
-    raison = f"< {obj} un dixième de (Eva={evus})"
+    raison = f"< {obj} un dixième de (Evus={evus})"
     p1.pousser_objectif('Loovma Geer',obj,raison)
     p1.lister_objectif()

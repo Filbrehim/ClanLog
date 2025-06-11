@@ -50,8 +50,10 @@ def valider_analyse(données,a) :
     """! valide une des analyses passée en argument
     @param données dictionnaires des données
     @param a une analyse
-    * profession
+    * buttin
     * dépeçage
+    * profession
+    * victoire
     """
 
     if "boucle" not in données :
@@ -82,3 +84,25 @@ def valider_analyse(données,a) :
         return "calcul des victoires ajoutées à la boucle",données
 
     return None,f"l'analyse {a} n'est pas disponible"
+
+def filtrer_date(données,date) :
+    """ filtrer sur les dates (relatives) des fichiers
+    * j(our)
+    * s(emaine)
+    * m(mois)
+    """
+    
+    t = -1
+    if date[0] == "j" :
+        données["filtre_date"] = 86400
+        return "ne conserve que les fichiers de 24h",données
+    
+    if date[0] == "s" :
+        données["filtre_date"] = 86400 * 7
+        return "ne conserve que les fichiers d'une semaine",données
+
+    if date[0] == "m" :
+        données["filtre_date"] = 86400 * 30
+        return "ne conserve que les fichiers du mois",données
+
+    return None,f"la critère de date ({date}) est inconue (j(our),s(emaine),m(ois))"
