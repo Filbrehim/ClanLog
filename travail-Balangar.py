@@ -58,13 +58,12 @@ if args.objectif :
     p1.pousser_objectif('Master Mentus',20,"franchir le portail sans encombre")
     eva = p1.résumé_métier('Eva')
     obj = eva // 4
-    raison = f"< {obj} (Eva={eva}) divisé par 4"
-    p1.pousser_objectif('Dentir Longtooth',obj,raison)
-    p1.pousser_objectif('Skea Brightfur',obj,raison)
+    raison = f"< {obj}, (Eva={eva}) divisé par 4"
     p1.pousser_objectif('Proximus',obj,raison)
     p1.pousser_objectif('Hardia',obj,raison)
     obj = eva // 10
-    raison = f"< {obj} (Eva={eva}) divisé par 10"
+    raison = f"< {obj}, (Eva={eva}) divisé par 10"
     p1.pousser_objectif('Radium',obj,raison)
+    p1.pousser_objectif('Horus',100,'Un peu quand même')
 
     p1.lister_objectif()

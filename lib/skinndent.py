@@ -29,7 +29,7 @@ class peauetdent:
         self.chemin_csv = f"results/dépeçage-{qui}.csv"
         self.ordre   = ['combien', 'total', 'mes parts', 'Don entrant', 'Don sortant']
         self.ordra   = ['Don entrant', 'combien', 'total', 'mes parts', 'Don sortant']
-        self.skin_re = re.compile(r"^\* ((?P<qui>.*) recovers the|You recover the)"
+        self.skin_re = re.compile(r"^[\* ]{0,2}((?P<qui>.*) recovers the|You recover the)"
                                   " (?P<quoi>[^,]+)"
                                   " (?P<type>fur|mandibles),"
                                   " worth (?P<vaut>[0-9]+)c."

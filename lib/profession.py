@@ -55,6 +55,12 @@ class professions:
     ## @var totaux
     # le total explicite pour chaque profession
 
+    incohérences = None
+    ## @var incohérences
+    # les incohérence niveau/appréciations
+
+    dernier_fichier = None
+    
     def __init__(self,qui,/,arguments = None) :
         """! initialisation des messages de progression
         @param qui le personnage dont on analyse les logs
@@ -74,6 +80,8 @@ class professions:
 # en attente génération csv digne de ce nom
         self.nolonger_re   = re.compile("no longer train with (?P<qui>[^.]+).")
         self.total         = 0
+        self.incohérences  = open(f"results/incohérences-{qui}.txt","w")
+        
         if arguments is not None and arguments.cache :
             self.cache = True
             self.cache_param = dict()
@@ -110,6 +118,7 @@ class professions:
         -1 par défaut
         """
         self.dernier_ts_unix = quand_unix
+        self.dernier_fichier = fichier
         return self.session_ts_apres
 
     def fin_session(self) :
@@ -122,6 +131,7 @@ class professions:
         """! plus de fichier à analyser
         déclenche des actions de maj de fichier
         """
+        self.incohérences.close()
         return None
 
     def analyser_ligne(self,ligne) :
@@ -154,7 +164,7 @@ class professions:
                             self.appréciations[self.incliner] = { 'comment' : tmp_c , 'niveau' : 550  }
                         return 1
             self.bow = False
-            if ligne.find(p1+" bows") != -1 :
+            if (ligne.find(p1+" bows") != -1 ) or (ligne.find(p1+" bows deeply") != -1)  :
                 self.bow = True
                 self.incliner = p1
                 return 1
@@ -168,6 +178,7 @@ class professions:
                 if p1.find("*last*") != -1 and self.dernier_prof is not None :
                     p = self.dernier_prof
                 self.total = self.total + 1
+
                 if self.professeurs[p1]['domaine'] in self.totaux :
                     self.totaux[self.professeurs[p1]['domaine']] = self.totaux[self.professeurs[p1]['domaine']] + 1
                 else :
@@ -177,6 +188,14 @@ class professions:
                 else :
                     self.appréciations[p] = {'niveau' : 1 ,
                                              'comment' : '** sans commentaire ** (Jules César)'}
+                ## vérifier Evus/Eva
+                if p1[0:2] == "Ev" and self.appréciations[p]['comment'] != '** sans commentaire ** (Jules César)' :
+                    a = p1
+                    if (self.appréciations[a]['niveau'] + 1 < self.compliments[self.appréciations[a]['comment']]['min']) :
+                        print(f"{a:17} sous estimé, calculé:{self.appréciations[a]['niveau']:3d}, compliment {self.appréciations[a]['comment']}, min={self.compliments[self.appréciations[a]['comment']]['min']}",file=self.incohérences)
+                    if (self.appréciations[a]['niveau'] - 1 > self.compliments[self.appréciations[a]['comment']]['max']) :
+                        print(f"{a:17} sur estimé, calculé:{self.appréciations[a]['niveau']:3d}, compliment {self.appréciations[a]['comment']}, max={self.compliments[self.appréciations[a]['comment']]['max']}",file=self.incohérences)
+##                       or (self.appréciations[a]['niveau'] > self.compliments[self.appréciations[a]['comment']]['max']) :
                 return 1
         nolonger = ligne.find("ou can no longer train with ")
         if nolonger != - 1 :
